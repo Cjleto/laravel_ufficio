@@ -9,6 +9,6 @@ class WelcomeController extends Controller
     //
     public function welcome($name = '', $lastname = '', Request $req){
         $res = $req->input('poppo');
-        return "Hello ".$name." ".$lastname." - ".$res." -- ".$req->input('rete');
+        return "Ciao  ".$name." ".$lastname." - ".$res." -- ".$req->input('rete');
     }
 }
