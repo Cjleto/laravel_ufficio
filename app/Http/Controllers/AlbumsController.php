@@ -104,9 +104,7 @@ class AlbumsController extends Controller
         return redirect()->route('albums');
     }
 
-    public function testlll(){
-        return 'asdasd';
-    }
+    
 
     public function processFile($id, Request $req, &$album)
     {
@@ -131,11 +129,15 @@ class AlbumsController extends Controller
     public function getImages(Album $album){
         //seleziono tutte le photos dell'album con id passato  nell'url
         $images = Photo::where('album_id',$album->id)->get();
+        
         //passo alla view sia album, per i dati principali e tutte le photo legate all'album
         return view('images.albumimages', compact('album','images'));
 
     }
 
+    public function testlll(){
+        return 'asdasd';
+    }
 
 
 
