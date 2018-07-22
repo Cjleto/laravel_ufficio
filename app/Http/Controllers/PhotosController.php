@@ -7,6 +7,7 @@ use App\Models\Album;
 use Illuminate\Http\Request;
 use Storage;
 
+
 class PhotosController extends Controller
 {
     /**
