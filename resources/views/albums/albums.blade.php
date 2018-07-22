@@ -23,10 +23,14 @@
                     {{$album->id}} {{$album->album_name}}
 
                     <div class="float-right">
+                        <a href="{{route('photos.create')}}?album_id={{$album->id}}" class="btn btn-primary edit">New Image</a>
+
                         @if($album->photos_count > 0)
                             <a href="/albums/{{$album->id}}/images" class="btn btn-primary edit">VIEW IMAGES ({{$album->photos_count}} )</a>
                         @endif
+
                         <a href="/albums/{{$album->id}}/edit" class="btn btn-primary edit">EDIT</a>
+
                         <a href="/albums/{{$album->id}}" class="btn btn-danger delete">DELETE</a>
                     </div>
                 </li>
