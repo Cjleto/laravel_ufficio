@@ -25,7 +25,7 @@ class AlbumsController extends Controller
         }
 
         $albums = $queryBuilder->get();
-        dd($queryBuilder);
+        //dd($queryBuilder);
         //dd($albums);
         return view('albums.albums', ['albums' => $albums] );
     }
