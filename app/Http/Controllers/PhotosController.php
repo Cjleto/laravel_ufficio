@@ -7,6 +7,7 @@ use App\Models\Album;
 use Illuminate\Http\Request;
 use Storage;
 
+
 class PhotosController extends Controller
 {
     /**
@@ -94,6 +95,7 @@ class PhotosController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy(Photo $photo)
+
     {
         $res = $photo->delete();
         if($res){
@@ -102,8 +104,11 @@ class PhotosController extends Controller
         return ''.$res;
     }
 
+
+
     public function processFile(Photo &$photo, Request $req=null)
     {
+
         if(!$req){
             $req = request();
         }
