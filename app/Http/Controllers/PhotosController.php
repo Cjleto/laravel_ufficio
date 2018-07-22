@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Photo;
+use App\Models\Album;
 use Illuminate\Http\Request;
-
+use Storage;
 
 class PhotosController extends Controller
 {
@@ -24,9 +25,17 @@ class PhotosController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        $id = $request->has('album_id')?$request->input('album_id') : null;
+
+        $album = Album::firstOrNew(['id' => $id]);
+
+
+        $photo = new Photo();
+
+
+        return view('images.editimage', compact('photo','album'));
     }
 
     /**
@@ -84,9 +93,43 @@ class PhotosController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Photo $photo)
     {
-        // elimina direttamente il record
-        return Photo::destroy($id);
+        $res = $photo->delete();
+        if($res){
+            $this->processFile($photo);
+        }
+        return ''.$res;
+    }
+
+    public function processFile(Photo &$photo, Request $req=null)
+    {
+        if(!$req){
+            $req = request();
+        }
+        if(!$req->hasFile('img_path') ){
+            return false;
+        }
+        $file = $req->file('img_path');
+        if(!$file->isValid()){
+            return false;
+        }
+        //$fileName = $file->store(env('ALBUM_THUMB_DIR'));
+        $fileName = $id . '.' . $file->extension();
+        $file->storeAs(env('IMG_DIR'), $fileName);
+        $album->img_path = env('IMG_DIR') ."/". $fileName;
+
+        return  true;
+
+
+
+    }
+
+    public function deleteFile(Photo $photo){
+        $disk = config('filesystem.default');
+        if($photo->img_path && Storage::disk($disk)->has($photo->img_path)){
+           return Storage::disk($disk)->delete($photo->img_path);
+        }
+        return false;
     }
 }
