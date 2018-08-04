@@ -5,7 +5,8 @@ use App\Models\Photo;
 use App\User;
 
 Route::get('/', function(){
-    return "Rooooot";
+    $msg = "<a href='".route('albums')."' >Albums</a>";
+    return $msg;
 });
 
 

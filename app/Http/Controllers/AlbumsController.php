@@ -7,8 +7,8 @@ namespace App\Http\Controllers;
 use App\Models\Album;
 use App\Models\Photo;
 use Illuminate\Http\Request;
-use DB;
-
+use App\Http\Requests\AlbumRequest;
+use App\Http\Requests\AlbumUpdateRequest;
 
 class AlbumsController extends Controller
 {
@@ -24,7 +24,7 @@ class AlbumsController extends Controller
             $queryBuilder->where('album_name','like', '%'.$request->album_name.'%');
         }
 
-        $albums = $queryBuilder->get();
+        $albums = $queryBuilder->paginate(env('IMG_PER_PAGE'));
         //dd($queryBuilder);
         //dd($albums);
         return view('albums.albums', ['albums' => $albums] );
@@ -53,7 +53,7 @@ class AlbumsController extends Controller
         return view('albums.edit')->with('album',$album[0]);
     }
 
-    public function store($id, Request $req){
+    public function store($id, AlbumUpdateRequest $req){
 
         $album = Album::find($id);
         $album->album_name = $req->input('name');
@@ -79,12 +79,12 @@ class AlbumsController extends Controller
         return view('albums.createalbum', ['album' => $album]);
     }
 
-    public function save(){
+    public function save(AlbumRequest $request){
 
         $album = new Album();
-        $album->album_name = request()->input('name');
+        $album->album_name = $request->input('name');
         $album->album_thumb = '';
-        $album->description = request()->input('description');
+        $album->description = $request->input('description');
         $album->user_id =  1;
 
         $res = $album->save();
@@ -93,7 +93,7 @@ class AlbumsController extends Controller
 
         if($res){
 
-            if($this->processFile($album->id, request(), $album)){
+            if($this->processFile($album->id, $request, $album)){
                 $album->save();
             }
         }
@@ -130,7 +130,7 @@ class AlbumsController extends Controller
 
     public function getImages(Album $album){
         //seleziono tutte le photos dell'album con id passato  nell'url
-        $images = Photo::where('album_id',$album->id)->get();
+        $images = Photo::where('album_id',$album->id)->paginate(env('IMG_PER_éAGE'));
         //passo alla view sia album, per i dati principali e tutte le photo legate all'album
         return view('images.albumimages', compact('album','images'));
 

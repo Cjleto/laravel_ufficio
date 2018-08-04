@@ -2,12 +2,14 @@
 @section('content')
     <h1>EDIT ALBUM</h1>
 
+    @include('partials.inputerrors')
+
     <form action="/albums/{{$album->id}}" method="POST" enctype="multipart/form-data">
         {{csrf_field()}}
         <input type="hidden" name="_method" value="PATCH">
         <div class="form-group">
             <label for="">Name</label>
-            <input type="text" class="form-control" name="name" id="name" placeholder="Album Name" value="{{$album->album_name}}">
+            <input type="text" class="form-control" name="name" id="name" placeholder="Album Name" value="{{old('name',$album->album_name)}}">
         </div>
         @include('albums.partial.fileupload')
         <div class="form-group">

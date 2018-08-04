@@ -1,5 +1,11 @@
 @extends('template.layout')
 @section('content')
+    <h1>Images for {{$album->album_name}}</h1>
+    @if(session()->has('message'))
+        @component('components.alert-info')
+            {{session()->get('message')}}
+        @endcomponent
+    @endif
 <table class="table">
     <tr>
         <th>ID</th>
@@ -16,7 +22,7 @@
             <td>{{$image->name}}</td>
             <td>{{$album->album_name}}</td>
             <td>
-                <img src="{{asset($image->img_path)}}" width="150" >
+                <img src="{{asset($image->path)}}" width="150" >
             </td>
             <td>
                 <a href="{{route('photos.destroy',$image->id)}}" class="btn btn-danger">DELETE</a>
@@ -25,11 +31,16 @@
         </tr>
         @empty
         <tr>
-            <td colspan="5">
+            <td colspan="6">
                 Nessuna immagine trovata
             </td>
         </tr>
     @endforelse
+    <tr>
+        <td colspan="6">
+            {{$images->links()}}
+        </td>
+    </tr>
 </table>
 @stop
 @section('footer')

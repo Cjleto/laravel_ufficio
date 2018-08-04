@@ -17,8 +17,15 @@ use App\Models\Album;
 
 $factory->define(App\Models\Photo::class, function (Faker $faker) {
     $c = array('abstract', 'animals', 'business', 'cats', 'city', 'food', 'nightlife','fashion', 'people', 'nature', 'sports', 'technics', 'transport');
-    return [
+    /*return [
         'album_id' => Album::inRandomOrder()->first()->id,
+        'description' => $faker->text(128),
+        'name' => $faker->text(64),
+        'img_path' => $faker->imageUrl(640,480, $faker->randomElement($c))
+
+    ];*/
+    return [
+        'album_id' => 1,
         'description' => $faker->text(128),
         'name' => $faker->text(64),
         'img_path' => $faker->imageUrl(640,480, $faker->randomElement($c))

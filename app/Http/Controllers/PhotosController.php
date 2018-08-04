@@ -1,15 +1,13 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Models\Photo;
 use App\Models\Album;
 use Illuminate\Http\Request;
 use Storage;
-
-
 class PhotosController extends Controller
 {
+
+
     /**
      * Display a listing of the resource.
      *
@@ -20,7 +18,6 @@ class PhotosController extends Controller
         //
         return Photo::get();
     }
-
     /**
      * Show the form for creating a new resource.
      *
@@ -29,16 +26,11 @@ class PhotosController extends Controller
     public function create(Request $request)
     {
         $id = $request->has('album_id')?$request->input('album_id') : null;
-
         $album = Album::firstOrNew(['id' => $id]);
-
-
         $photo = new Photo();
-
-
-        return view('images.editimage', compact('photo','album'));
+        $albums = $this->getAlbums();
+        return view('images.editimage', compact('photo','album','albums'));
     }
-
     /**
      * Store a newly created resource in storage.
      *
@@ -48,8 +40,23 @@ class PhotosController extends Controller
     public function store(Request $request)
     {
         //
-    }
 
+        $photo = new Photo();
+        $photo->album_id = $request->album_id;
+        $photo->name = $request->input('name');
+        $photo->description = $request->input('description');
+        $this->processFile($photo);
+
+        $res = $photo->save();
+
+
+
+        $message = $res ? "Photo ".$photo->name. " inserita." : "Photo".$photo->name. " NON inserita.";
+        session()->flash('message',$message);
+        return redirect()->route('album.getimages',$photo->album_id);
+
+
+    }
     /**
      * Display the specified resource.
      *
@@ -61,7 +68,6 @@ class PhotosController extends Controller
         //
         dd($photo);
     }
-
     /**
      * Show the form for editing the specified resource.
      *
@@ -71,10 +77,10 @@ class PhotosController extends Controller
     public function edit(Photo $photo)
     {
         //
-
-        return view('images.editimage', compact('photo'));
+        $albums = $this->getAlbums();
+        $album = $photo->album;
+        return view('images.editimage', compact('photo','albums','album'));
     }
-
     /**
      * Update the specified resource in storage.
      *
@@ -82,12 +88,24 @@ class PhotosController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $photo)
+    public function update(Request $request, Photo $photo)
     {
         //
-        dd($photo);
-    }
 
+        $this->processFile($photo);
+        $photo->name = $request->input('name');
+        $photo->description = $request->input('description');
+
+        $photo->album_id = $request->album_id;
+
+        $res = $photo->save();
+
+        $message = $res ? "Photo ".$photo->name. " updatata." : "Photo".$photo->name. " NON updatata.";
+        session()->flash('message',$message);
+        return redirect()->route('album.getimages',$photo->album_id);
+
+        //dd($photo);
+    }
     /**
      * Remove the specified resource from storage.
      *
@@ -102,8 +120,7 @@ class PhotosController extends Controller
         }
         return ''.$res;
     }
-
-    public function processFile(Photo &$photo, Request $req=null)
+    public function processFile(Photo $photo, Request $req=null)
     {
         if(!$req){
             $req = request();
@@ -116,21 +133,20 @@ class PhotosController extends Controller
             return false;
         }
         //$fileName = $file->store(env('ALBUM_THUMB_DIR'));
-        $fileName = $id . '.' . $file->extension();
-        $file->storeAs(env('IMG_DIR'), $fileName);
-        $album->img_path = env('IMG_DIR') ."/". $fileName;
-
+        $fileName = $photo->id . '.' . $file->extension();
+        $file->storeAs(env('IMG_DIR')."/".$photo->album_id, $fileName);
+        $photo->img_path = env('IMG_DIR')."/".$photo->album_id."/". $fileName;
         return  true;
-
-
-
     }
-
     public function deleteFile(Photo $photo){
         $disk = config('filesystem.default');
         if($photo->img_path && Storage::disk($disk)->has($photo->img_path)){
            return Storage::disk($disk)->delete($photo->img_path);
         }
         return false;
+    }
+
+    public function getAlbums(){
+        return Album::orderBy('album_name')->get();
     }
 }
