@@ -12,10 +12,24 @@ use App\Http\Requests\AlbumUpdateRequest;
 
 class AlbumsController extends Controller
 {
+
+    public function __costruct(){
+        //altro modo per definire i metodi per i middleware è dichiararlo nel costruttore
+        //al momento le gestisco direttamente nel file delle rotte
+        //$this->middleware('auth');
+        //$this->middleware('auth')->except('index');
+        //$this->middleware('auth')->only('index');
+    }
+
     //
     public function index( Request $request){
         //return Album::all();
         $queryBuilder = Album::orderByDesc('id')->withCount('photos');
+
+        //dd($request->user());
+        //filtro albume dell'utente connesso
+        $queryBuilder->where('user_id',$request->user()->id);
+
         if($request->has('id')){
             $queryBuilder->where('id','=', $request->id);
         }
@@ -58,7 +72,7 @@ class AlbumsController extends Controller
         $album = Album::find($id);
         $album->album_name = $req->input('name');
         $album->description = $req->input('description');
-        $album->user_id = 1;
+        $album->user_id = $req->user()->id;
 
 
 
@@ -85,7 +99,7 @@ class AlbumsController extends Controller
         $album->album_name = $request->input('name');
         $album->album_thumb = '';
         $album->description = $request->input('description');
-        $album->user_id =  1;
+        $album->user_id =  $request->user()->id;
 
         $res = $album->save();
 
